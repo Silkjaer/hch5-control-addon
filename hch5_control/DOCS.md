@@ -47,7 +47,8 @@ derfor være koblet fra RS485-ledningen.
 | `read` | Kun læsninger (FC03/FC04) |
 | `fans` | Læsninger og ventilatorer (register 66/67) |
 | `fans_bypass` | Læsninger, ventilatorer og bypass (register 68) |
-| `direct` | Alt, uden guard. Pejs, standby og eftervarme kræver dette |
+| `fans_bypass_fireplace` | Som `fans_bypass` plus register 76, som pejs og standby bruger. Alt, controlleren gør på et anlæg uden HAC1 |
+| `direct` | Alt, uden guard. Kun nødvendigt for eftervarme med HAC1 |
 
 Alt, guarden afviser, og alle skrivninger logges i `state/bus-guard.log`.
 

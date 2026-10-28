@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1-silkjaer.4
+
+- New bus access level `fans_bypass_fireplace`: also allows register 76, which
+  fireplace and standby mode need. On a unit without HAC1 that is everything
+  the controller writes.
+
 ## 1.6.1-silkjaer.3
 
 - The WebUI opens inside Home Assistant (ingress) and has its own sidebar entry,

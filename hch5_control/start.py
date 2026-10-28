@@ -43,6 +43,8 @@ GUARD_ALLOW = {
     "read": "read",
     "fans": "read,write:1:66/67",
     "fans_bypass": "read,write:1:66/67/68",
+    # Fireplace and standby also set the unit's special-mode flag, register 76.
+    "fans_bypass_fireplace": "read,write:1:66/67/68/76",
 }
 
 

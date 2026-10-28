@@ -1,5 +1,5 @@
 name: HCH5 Control
-version: "1.6.1-silkjaer.3"
+version: "1.6.1-silkjaer.4"
 slug: hch5_control
 description: Local controller and WebUI for a Dantherm HCH5 over an RS485 TCP adapter
 url: https://github.com/Silkjaer/dantherm-control
@@ -31,6 +31,6 @@ options:
 schema:
   adapter_host: str
   adapter_port: port
-  bus_access: list(read_only|read|fans|fans_bypass|direct)
+  bus_access: list(read_only|read|fans|fans_bypass|fans_bypass_fireplace|direct)
   controller_token: password?
   log_level: list(debug|info|warning|error)?

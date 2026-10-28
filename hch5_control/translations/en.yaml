@@ -8,8 +8,9 @@ configuration:
   bus_access:
     name: Bus access
     description: >-
-      What the controller may send on the bus. read_only sends nothing; read, fans and
-      fans_bypass open it step by step through the bus guard; direct removes the guard.
+      What the controller may send on the bus. read_only sends nothing; read, fans,
+      fans_bypass and fans_bypass_fireplace (adds register 76 for fireplace and standby)
+      open it step by step through the bus guard; direct removes the guard.
       Only one controller may have write access at a time.
   controller_token:
     name: Controller API key
