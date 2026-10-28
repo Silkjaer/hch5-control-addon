@@ -1,0 +1,21 @@
+configuration:
+  adapter_host:
+    name: RS485 adapter address
+    description: IP address of the RS485-to-Ethernet adapter (transparent TCP, 19200 8E1).
+  adapter_port:
+    name: RS485 adapter port
+    description: TCP port of the adapter.
+  bus_access:
+    name: Bus access
+    description: >-
+      What the controller may send on the bus. read_only sends nothing; read, fans and
+      fans_bypass open it step by step through the bus guard; direct removes the guard.
+      Only one controller may have write access at a time.
+  controller_token:
+    name: Controller API key
+    description: Optional fixed key for the Home Assistant integration. Leave empty to create one in the WebUI.
+  log_level:
+    name: Log level
+network:
+  8080/tcp: WebUI and controller API
+  4196/tcp: Raw RS485 mirror for the Home Assistant integration (read-only)

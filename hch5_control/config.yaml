@@ -1,0 +1,32 @@
+name: HCH5 Control
+version: "1.6.1-silkjaer.1"
+slug: hch5_control
+description: Local controller and WebUI for a Dantherm HCH5 over an RS485 TCP adapter
+url: https://github.com/Silkjaer/dantherm-control
+arch:
+  - aarch64
+  - amd64
+  - armv7
+startup: application
+boot: auto
+init: false
+watchdog: http://[HOST]:[PORT:8080]/login
+webui: http://[HOST]:[PORT:8080]/
+ports:
+  8080/tcp: 8088
+  4196/tcp: null
+ports_description:
+  8080/tcp: WebUI and controller API for Home Assistant
+  4196/tcp: Raw RS485 mirror (read-only), off unless a host port is set
+map:
+  - addon_config:rw
+options:
+  adapter_host: 192.168.1.200
+  adapter_port: 4196
+  bus_access: read_only
+schema:
+  adapter_host: str
+  adapter_port: port
+  bus_access: list(read_only|read|fans|fans_bypass|direct)
+  controller_token: password?
+  log_level: list(debug|info|warning|error)?
