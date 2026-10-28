@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.1-silkjaer.5
+
+- Works for every HCH5: `unit` (mk1/mk2) and `connection` (tcp/serial) replace
+  the adapter-only setup, including USB-RS485 adapters and MKII over Modbus TCP
+  or RTU. The controller talks to the unit directly, as it does on a Raspberry Pi.
+- `read_only` (MK1 behind a TCP adapter) replaces the `bus_access` levels.
+  **Breaking:** set the new options after updating.
+
 ## 1.6.1-silkjaer.4
 
 - New bus access level `fans_bypass_fireplace`: also allows register 76, which

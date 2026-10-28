@@ -7,8 +7,12 @@
 * Files placed in share/hch5_control_import (visible in every Samba or SSH
   setup) are moved into that state folder at the next start, to bring over an
   existing installation.
-* Unless bus_access is "direct", the bus guard sits between the controller
-  and the RS485 adapter and forwards only what bus_access allows.
+* unit and connection pick the setup: an MK1 on its RS485 bus (TCP adapter or
+  USB adapter) or an MKII over Modbus (TCP or RTU). The controller talks to the
+  unit directly and keeps its own safety: it yields to HCP4, finds out whether
+  a HAC1 is there and sends only verified commands.
+* read_only (MK1 behind a TCP adapter only) puts the bus guard in front of the
+  adapter with nothing allowed through, to try the app next to other control.
 * The guard and the controller are restarted on their own if they stop, like
   systemd's Restart=always on a Raspberry Pi install.
 """
@@ -37,15 +41,51 @@ GUARD_LISTEN = ("127.0.0.1", 4300)
 # Home Assistant's ingress proxy; its requests are logged in as the WebUI admin.
 INGRESS_PROXY = "172.30.32.2"
 
-# What each bus_access level lets through the guard (see bus_guard.py).
-GUARD_ALLOW = {
-    "read_only": "",
-    "read": "read",
-    "fans": "read,write:1:66/67",
-    "fans_bypass": "read,write:1:66/67/68",
-    # Fireplace and standby also set the unit's special-mode flag, register 76.
-    "fans_bypass_fireplace": "read,write:1:66/67/68/76",
-}
+DEFAULT_PORTS = {"mk1": 4196, "mk2": 502}
+MK2_PROXY_PORT = 5020
+
+
+class SetupError(Exception):
+    """An option combination the app cannot run; shown in the app log."""
+
+
+def plan(options: dict) -> dict:
+    """Turn the app options into the controller's serial/unit settings.
+
+    Returns serial_port, the optional unit block (MKII), the guard's upstream
+    when read_only puts it in front of an MK1 TCP adapter, and a description.
+    """
+    unit = options.get("unit", "mk1")
+    connection = options.get("connection", "tcp")
+    read_only = bool(options.get("read_only"))
+    if connection == "tcp":
+        host = str(options.get("adapter_host") or "").strip()
+        if not host:
+            raise SetupError("adapter_host is empty: set the IP of the RS485 adapter (MK1) or the unit (MKII)")
+        port = int(options.get("adapter_port") or DEFAULT_PORTS[unit])
+        target = f"{host}:{port}"
+    else:
+        target = str(options.get("serial_device") or "").strip()
+        if not target:
+            raise SetupError("serial_device is empty: pick the USB-RS485 adapter")
+    if read_only and not (unit == "mk1" and connection == "tcp"):
+        raise SetupError("read_only works only for an MK1 behind an RS485 TCP adapter; turn it off")
+
+    if unit == "mk2":
+        block = {"generation": "mk2", "transport": "tcp" if connection == "tcp" else "rtu",
+                 "unit_id": int(options.get("mk2_unit_id") or 1), "proxy_port": MK2_PROXY_PORT}
+        if connection == "tcp":
+            block.update(host=host, port=port)
+        return {"serial_port": target if connection == "serial" else "", "unit": block, "guard": None,
+                "description": f"MKII over Modbus {block['transport'].upper()} at {target}"}
+    if connection == "serial":
+        return {"serial_port": target, "unit": None, "guard": None,
+                "description": f"MK1 on the RS485 bus through {target}"}
+    if read_only:
+        return {"serial_port": f"socket://{GUARD_LISTEN[0]}:{GUARD_LISTEN[1]}", "unit": None, "guard": target,
+                "description": f"MK1 through the RS485 TCP adapter {target}, read only (bus guard sends nothing)"}
+    return {"serial_port": f"socket://{target}", "unit": None, "guard": None,
+            "description": f"MK1 through the RS485 TCP adapter {target}"}
 
 
 def log(message: str) -> None:
@@ -81,9 +121,9 @@ def import_state() -> None:
     log(f"imported {len(files)} file(s) from {IMPORT_DIR}: {', '.join(sorted(p.name for p in files))}; folder renamed to {done.name}")
 
 
-def controller_config(serial_port: str) -> dict:
-    """The installer's defaults (install.sh), with the given serial port."""
-    return {
+def controller_config(serial_port: str, unit: dict | None) -> dict:
+    """The installer's defaults (install.sh), with the given connection."""
+    config = {
         "device": {"id": "dantherm_hch5", "name": "Dantherm HCH5"},
         "mqtt": {"enabled": False, "topic_prefix": "dantherm",
                  "discovery_prefix": "homeassistant", "retain": True},
@@ -107,6 +147,9 @@ def controller_config(serial_port: str) -> dict:
         "diagnostic_capture": {"directory": str(STATE_LINK / "direction-captures")},
         "filter": {"enabled": False},
     }
+    if unit is not None:
+        config["unit"] = unit
+    return config
 
 
 def wait_for_port(address: tuple[str, int], seconds: float) -> bool:
@@ -154,8 +197,12 @@ class Service:
 
 def main() -> int:
     options = json.loads(OPTIONS.read_text())
-    adapter = f"{options['adapter_host']}:{options['adapter_port']}"
-    access = options.get("bus_access", "read_only")
+    try:
+        setup = plan(options)
+    except SetupError as error:
+        log(f"cannot start: {error}")
+        return 1
+    log(setup["description"])
     link_state_dir()
     import_state()
 
@@ -167,27 +214,21 @@ def main() -> int:
         env["DANTHERM_CONTROLLER_TOKEN"] = options["controller_token"]
 
     services: list[Service] = []
-    if access == "direct":
-        log(f"bus access: direct to {adapter} (no guard)")
-        serial_port = f"socket://{adapter}"
-    else:
-        allow = GUARD_ALLOW[access]
-        log(f"bus access: {access} through the guard to {adapter} (allow: {allow or 'nothing'})")
+    if setup["guard"]:
         guard = Service("bus guard", [sys.executable, "-u", str(GUARD)], {
             **env,
-            "UPSTREAM": adapter,
+            "UPSTREAM": setup["guard"],
             "LISTEN": f"{GUARD_LISTEN[0]}:{GUARD_LISTEN[1]}",
-            "ALLOW": allow,
+            "ALLOW": "",
             "TX_LOG": str(STATE_DIR / "bus-guard.log"),
-            "TX_LOG_READS": "0",
         })
         guard.start()
         services.append(guard)
         if not wait_for_port(GUARD_LISTEN, 15):
             log("bus guard did not start listening; continuing, the controller will retry")
-        serial_port = f"socket://{GUARD_LISTEN[0]}:{GUARD_LISTEN[1]}"
 
-    CONTROLLER_CONFIG.write_text(yaml.safe_dump(controller_config(serial_port), sort_keys=False))
+    config = controller_config(setup["serial_port"], setup["unit"])
+    CONTROLLER_CONFIG.write_text(yaml.safe_dump(config, sort_keys=False))
     controller = Service("controller", [
         sys.executable, "-u", "dantherm_controller_gateway.py",
         "-c", str(CONTROLLER_CONFIG),

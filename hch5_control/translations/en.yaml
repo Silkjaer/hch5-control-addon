@@ -1,17 +1,27 @@
 configuration:
+  unit:
+    name: Unit
+    description: HCH5 MK1 (RS485 bus, with or without HAC1) or HCH5 MKII (its own Modbus).
+  connection:
+    name: Connection
+    description: tcp for a network adapter or an MKII on the network, serial for a USB-RS485 adapter in this machine.
   adapter_host:
-    name: RS485 adapter address
-    description: IP address of the RS485-to-Ethernet adapter (transparent TCP, 19200 8E1).
+    name: Address
+    description: tcp only. IP of the RS485-to-Ethernet adapter (MK1) or of the unit (MKII).
   adapter_port:
-    name: RS485 adapter port
-    description: TCP port of the adapter.
-  bus_access:
-    name: Bus access
+    name: Port
+    description: tcp only. Leave empty for the default (4196 for MK1, 502 for MKII).
+  serial_device:
+    name: USB adapter
+    description: serial only. The USB-RS485 adapter.
+  mk2_unit_id:
+    name: MKII Modbus address
+    description: MKII only. Default 1.
+  read_only:
+    name: Read only
     description: >-
-      What the controller may send on the bus. read_only sends nothing; read, fans,
-      fans_bypass and fans_bypass_fireplace (adds register 76 for fireplace and standby)
-      open it step by step through the bus guard; direct removes the guard.
-      Only one controller may have write access at a time.
+      MK1 behind a TCP adapter only. Nothing is sent on the bus, to try the app next to other
+      control. Only one controller may control the unit at a time.
   controller_token:
     name: Controller API key
     description: Optional fixed key for the Home Assistant integration. Leave empty to create one in the WebUI.
@@ -19,4 +29,5 @@ configuration:
     name: Log level
 network:
   8080/tcp: Controller API for the Home Assistant integration
-  4196/tcp: Raw RS485 mirror for the Home Assistant integration (read-only)
+  4196/tcp: MK1 raw RS485 mirror for the integration (read-only)
+  5020/tcp: MKII Modbus TCP proxy for the integration (read-only)
