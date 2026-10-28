@@ -1,5 +1,5 @@
 name: HCH5 Control
-version: "1.6.1-silkjaer.1"
+version: "1.6.1-silkjaer.2"
 slug: hch5_control
 description: Local controller and WebUI for a Dantherm HCH5 over an RS485 TCP adapter
 url: https://github.com/Silkjaer/dantherm-control
@@ -20,6 +20,7 @@ ports_description:
   4196/tcp: Raw RS485 mirror (read-only), off unless a host port is set
 map:
   - addon_config:rw
+  - share:rw
 options:
   adapter_host: 192.168.1.200
   adapter_port: 4196

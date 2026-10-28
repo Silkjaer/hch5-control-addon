@@ -17,4 +17,6 @@ RUN git init -q /src \
 
 COPY start.py /start.py
 WORKDIR /opt/dantherm-passivelink-webui
-CMD ["python3", "-u", "/start.py"]
+# s6 starts CMD without the container environment; with-contenv restores it,
+# so TZ from Home Assistant reaches the controller (week plan, night mode).
+CMD ["/command/with-contenv", "python3", "-u", "/start.py"]

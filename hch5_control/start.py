@@ -4,6 +4,9 @@
 * Options come from /data/options.json (the app's Configuration tab).
 * All controller state lives in the app's config folder: /config here,
   addon_configs/<slug>/state over Samba, and part of Home Assistant backups.
+* Files placed in share/hch5_control_import (visible in every Samba or SSH
+  setup) are moved into that state folder at the next start, to bring over an
+  existing installation.
 * Unless bus_access is "direct", the bus guard sits between the controller
   and the RS485 adapter and forwards only what bus_access allows.
 * The guard and the controller are restarted on their own if they stop, like
@@ -13,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import signal
 import socket
 import subprocess
@@ -25,6 +29,7 @@ import yaml
 OPTIONS = Path("/data/options.json")
 STATE_DIR = Path("/config/state")
 STATE_LINK = Path("/var/lib/dantherm-hch5-ha")
+IMPORT_DIR = Path("/share/hch5_control_import")
 CONTROLLER_CONFIG = Path("/data/controller.yaml")
 APP_DIR = Path("/opt/dantherm-passivelink-webui")
 GUARD = Path("/opt/bus_guard.py")
@@ -52,6 +57,24 @@ def link_state_dir() -> None:
         raise SystemExit(f"{STATE_LINK} exists and is not a link")
     STATE_LINK.parent.mkdir(parents=True, exist_ok=True)
     STATE_LINK.symlink_to(STATE_DIR)
+
+
+def import_state() -> None:
+    """Move an earlier installation's files from the share folder into state.
+
+    The folder is renamed afterwards, so the import runs once and the copy
+    stays as a backup until it is deleted by hand.
+    """
+    if not IMPORT_DIR.is_dir():
+        return
+    files = [path for path in IMPORT_DIR.iterdir() if path.is_file() and not path.name.startswith(".")]
+    if not files:
+        return
+    for path in files:
+        shutil.copy2(path, STATE_DIR / path.name)
+    done = IMPORT_DIR.with_name(f"{IMPORT_DIR.name}.done-{time.strftime('%Y%m%d-%H%M%S')}")
+    IMPORT_DIR.rename(done)
+    log(f"imported {len(files)} file(s) from {IMPORT_DIR}: {', '.join(sorted(p.name for p in files))}; folder renamed to {done.name}")
 
 
 def controller_config(serial_port: str) -> dict:
@@ -130,6 +153,7 @@ def main() -> int:
     adapter = f"{options['adapter_host']}:{options['adapter_port']}"
     access = options.get("bus_access", "read_only")
     link_state_dir()
+    import_state()
 
     env = dict(os.environ)
     env["PYTHONUNBUFFERED"] = "1"

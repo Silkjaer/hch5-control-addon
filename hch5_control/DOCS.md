@@ -58,8 +58,12 @@ Al tilstand ligger i appens config-mappe, `addon_configs/<id>_hch5_control/state
 (via Samba eller SSH), og kommer med i Home Assistants backups: indstillinger,
 rum og indregulering, brugere, historik og logs.
 
-**Flyt fra en anden installation:** stop appen, kopier filerne fra den gamle
-`/var/lib/dantherm-hch5-ha` (eller `docker/data`) ind i `state`, og start appen.
+**Flyt fra en anden installation:** læg filerne fra den gamle
+`/var/lib/dantherm-hch5-ha` (eller `docker/data`) i mappen
+`share/hch5_control_import` og start (eller genstart) appen. Den flytter dem ind
+i `state` og omdøber importmappen til `hch5_control_import.done-<tidspunkt>`,
+så det kun sker én gang. Du kan også kopiere direkte ind i `state`, hvis du kan
+se `addon_configs`.
 
 ## Home Assistant-integrationen
 
