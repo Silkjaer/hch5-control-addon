@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1-silkjaer.3
+
+- The WebUI opens inside Home Assistant (ingress) and has its own sidebar entry,
+  "Ventilation". Home Assistant's login is used: no separate WebUI login there.
+  Port 8088 stays for the integration's controller API and needs the WebUI login.
+
 ## 1.6.1-silkjaer.2
 
 - Import an existing installation from `share/hch5_control_import` at start,

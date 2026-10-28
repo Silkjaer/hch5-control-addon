@@ -1,5 +1,5 @@
 name: HCH5 Control
-version: "1.6.1-silkjaer.2"
+version: "1.6.1-silkjaer.3"
 slug: hch5_control
 description: Local controller and WebUI for a Dantherm HCH5 over an RS485 TCP adapter
 url: https://github.com/Silkjaer/dantherm-control
@@ -11,12 +11,15 @@ startup: application
 boot: auto
 init: false
 watchdog: http://[HOST]:[PORT:8080]/login
-webui: http://[HOST]:[PORT:8080]/
+ingress: true
+ingress_port: 8080
+panel_icon: mdi:hvac
+panel_title: Ventilation
 ports:
   8080/tcp: 8088
   4196/tcp: null
 ports_description:
-  8080/tcp: WebUI and controller API for Home Assistant
+  8080/tcp: Controller API for the Home Assistant integration (the WebUI opens in the sidebar)
   4196/tcp: Raw RS485 mirror (read-only), off unless a host port is set
 map:
   - addon_config:rw

@@ -17,5 +17,5 @@ configuration:
   log_level:
     name: Log level
 network:
-  8080/tcp: WebUI and controller API
+  8080/tcp: Controller API for the Home Assistant integration
   4196/tcp: Raw RS485 mirror for the Home Assistant integration (read-only)

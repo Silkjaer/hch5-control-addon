@@ -34,6 +34,8 @@ CONTROLLER_CONFIG = Path("/data/controller.yaml")
 APP_DIR = Path("/opt/dantherm-passivelink-webui")
 GUARD = Path("/opt/bus_guard.py")
 GUARD_LISTEN = ("127.0.0.1", 4300)
+# Home Assistant's ingress proxy; its requests are logged in as the WebUI admin.
+INGRESS_PROXY = "172.30.32.2"
 
 # What each bus_access level lets through the guard (see bus_guard.py).
 GUARD_ALLOW = {
@@ -158,6 +160,7 @@ def main() -> int:
     env = dict(os.environ)
     env["PYTHONUNBUFFERED"] = "1"
     env["DANTHERM_WEBUI_AUTH_FILE"] = str(STATE_LINK / "webui-auth.json")
+    env["DANTHERM_INGRESS_PROXY"] = INGRESS_PROXY
     if options.get("controller_token"):
         env["DANTHERM_CONTROLLER_TOKEN"] = options["controller_token"]
 

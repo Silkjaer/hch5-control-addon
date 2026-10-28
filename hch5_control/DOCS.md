@@ -17,8 +17,14 @@ RS485-adapter (adapter_host:adapter_port)
       │
 bus guard  ── sender kun det, bus_access tillader; logger alt andet
       │
-controller ── WebUI og controller-API på port 8088 (kan ændres)
+controller ── WebUI i Home Assistants sidemenu (Ventilation)
+                controller-API på port 8088 til integrationen
 ```
+
+WebUI'en åbner i Home Assistant via *Åbn web-UI* eller **Ventilation** i
+sidemenuen. Du er logget ind som WebUI'ens administrator, fordi Home Assistant
+allerede har logget dig ind; panelet vises kun for Home Assistant-administratorer.
+På port 8088 kræver WebUI'en stadig sit eget login.
 
 Controlleren overtager kun bussen, når HCP4 har været stille i 10 sekunder,
 og trækker sig, så snart HCP4 skriver igen. For aktiv styring skal HCP4
