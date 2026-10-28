@@ -1,83 +1,89 @@
 # HCH5 Control
 
-Lokal styring af et Dantherm HCH5, med WebUI i Home Assistant. Appen kører
-controlleren fra
+Local control of a Dantherm HCH5, with its WebUI inside Home Assistant. The app
+runs the controller from
 [Silkjaer/dantherm-control](https://github.com/Silkjaer/dantherm-control),
-som bygger på [MRDonnii/dantherm-control](https://github.com/MRDonnii/dantherm-control).
+which builds on [MRDonnii/dantherm-control](https://github.com/MRDonnii/dantherm-control).
 
-| Anlæg | Forbindelse |
+| Unit | Connection |
 |---|---|
-| **HCH5 MK1** (med eller uden HAC1) | RS485-bussen via en RS485-til-Ethernet-adapter i transparent TCP-tilstand (fx Waveshare, 19200 8E1) eller en USB-RS485-adapter i Home Assistant-maskinen |
-| **HCH5 MKII** | Anlæggets egen Modbus, over TCP (port 502) eller RTU via USB |
+| **HCH5 MK1** (with or without HAC1) | The RS485 bus, through an RS485-to-Ethernet adapter in transparent TCP mode (for example Waveshare, 19200 8E1) or a USB-RS485 adapter in the Home Assistant machine |
+| **HCH5 MKII** | The unit's own Modbus, over TCP (port 502) or RTU through USB |
 
-> Uofficielt community-projekt. Ikke udviklet, godkendt eller supporteret af
-> Dantherm. Ændringer af anlæggets styring sker på eget ansvar. Behold HCP4
-> (MK1), så anlægget kan føres tilbage.
+> Unofficial community project. Not developed, approved or supported by
+> Dantherm. Changing how the unit is controlled is at your own risk. Keep the
+> HCP4 panel (MK1) so the installation can be returned to its original setup.
 
-## Sådan virker det
+## How it works
 
-WebUI'en åbner i Home Assistant via *Åbn web-UI* eller **Ventilation** i
-sidemenuen. Du er logget ind som WebUI'ens administrator, fordi Home Assistant
-allerede har logget dig ind; panelet vises kun for Home Assistant-administratorer.
-Port 8088 bruges af Home Assistant-integrationens controller-API; dér kræver
-WebUI'en stadig sit eget login.
+The WebUI opens inside Home Assistant through *Open web UI* or **Ventilation**
+in the sidebar. You are signed in as the WebUI's administrator, because Home
+Assistant has already signed you in; the panel is shown to Home Assistant
+administrators only. Port 8088 serves the Home Assistant integration's
+controller API; there the WebUI still asks for its own login.
 
-Controlleren har sin egen sikkerhed: på et MK1 overtager den kun bussen, når
-HCP4 har været stille i 10 sekunder, og trækker sig, så snart HCP4 skriver
-igen. Den finder selv ud af, om der er en HAC1, og sender kun verificerede
-kommandoer. For aktiv styring af et MK1 skal HCP4 være koblet fra RS485-ledningen.
+The controller keeps its own safety: on an MK1 it takes over the bus only after
+HCP4 has been quiet for 10 seconds and steps back as soon as HCP4 writes again.
+It finds out by itself whether a HAC1 is installed and hides the afterheat
+parts when it is not, and it sends only verified commands. To control an MK1,
+disconnect HCP4 from the RS485 line.
 
-## Indstillinger
+## Options
 
-| Indstilling | Betydning |
+| Option | Meaning |
 |---|---|
-| `unit` | `mk1` eller `mk2` |
-| `connection` | `tcp` (netværk) eller `serial` (USB-adapter i Home Assistant-maskinen) |
-| `adapter_host`, `adapter_port` | Ved `tcp`: RS485-adapterens IP og port (MK1, ofte 4196) eller anlæggets IP (MKII, port 502). Tom port vælger standarden |
-| `serial_device` | Ved `serial`: USB-RS485-adapteren |
-| `mk2_unit_id` | MKII's Modbus-adresse, standard 1 |
-| `read_only` | Kun læsning, til at prøve appen ved siden af en anden styring. Se nedenfor |
-| `controller_token` | Valgfri fast nøgle til Home Assistant-integrationen. Tom: lav den i WebUI'en |
-| `log_level` | Logniveau, standard `info` |
+| `unit` | `mk1` or `mk2` |
+| `connection` | `tcp` (network) or `serial` (USB adapter in the Home Assistant machine) |
+| `adapter_host`, `adapter_port` | With `tcp`: the RS485 adapter's IP and port (MK1, often 4196) or the unit's IP (MKII, port 502). An empty port uses the default |
+| `serial_device` | With `serial`: the USB-RS485 adapter |
+| `mk2_unit_id` | The MKII's Modbus address, default 1 |
+| `read_only` | Read only, to try the app next to other control. See below |
+| `controller_token` | Optional fixed key for the Home Assistant integration. Empty: create one in the WebUI |
+| `log_level` | Log level, default `info` |
 
-**`read_only`** findes kun for et MK1 bag en TCP-adapter. Så sidder en lille
-"bus guard" mellem controlleren og adapteren og sender intet videre; alt, den
-afviser, logges i `state/bus-guard.log`. Controlleren viser data og sine
-beslutninger, men styrer ikke. Med USB eller MKII afviser appen `read_only`.
+**`read_only`** exists only for an MK1 behind a TCP adapter. A small bus guard
+then sits between the controller and the adapter and forwards nothing;
+everything it refuses is logged in `state/bus-guard.log`. The controller shows
+data and its decisions but does not control the unit. With USB or an MKII the
+app refuses `read_only`.
 
-## Kun én controller ad gangen
+## Only one controller at a time
 
-En RS485-til-Ethernet-adapter sender ikke det, den selv udsender på bussen,
-videre til andre TCP-klienter. To controllere gennem samme adapter kan derfor
-**ikke se hinanden**, og begge vil tro, de er master. Stop altid andre
-controllere, før denne app styrer, eller kør den med `read_only`.
+An RS485-to-Ethernet adapter does not pass what it sends on the bus to its
+other TCP clients. Two controllers behind the same adapter therefore **cannot
+see each other**, and both will believe they are the bus master. Always stop
+any other controller before this app takes control, or run it with `read_only`.
 
-## Data og backup
+## Data and backups
 
-Al tilstand ligger i appens config-mappe, `addon_configs/<id>_hch5_control/state`
-(via Samba eller SSH), og kommer med i Home Assistants backups: indstillinger,
-rum og indregulering, brugere, historik og logs.
+All state lives in the app's config folder, `addon_configs/<id>_hch5_control/state`,
+and is part of Home Assistant backups: settings, rooms and commissioning,
+users, history and logs.
 
-**Flyt fra en anden installation:** læg filerne fra den gamle
-`/var/lib/dantherm-hch5-ha` (eller `docker/data`) i mappen
-`share/hch5_control_import` og start (eller genstart) appen. Den flytter dem ind
-i `state` og omdøber importmappen til `hch5_control_import.done-<tidspunkt>`,
-så det kun sker én gang. Du kan også kopiere direkte ind i `state`, hvis du kan
-se `addon_configs`.
+**Moving from another installation:** put the files from the old
+`/var/lib/dantherm-hch5-ha` (or `docker/data`) into `share/hch5_control_import`
+and start or restart the app. It moves them into `state` and renames the import
+folder to `hch5_control_import.done-<time>`, so the import runs once. You can
+also copy straight into `state` if you can see `addon_configs` (the Terminal &
+SSH app cannot).
 
-## Home Assistant-integrationen
+## The Home Assistant integration
 
-Brug [dantherm-control-ha](https://github.com/Silkjaer/dantherm-control-ha):
+Use [dantherm-control-ha](https://github.com/Silkjaer/dantherm-control-ha):
 
-- **Data:** sæt en værtsport for `4196/tcp` i appens netværksindstillinger, og
-  peg integrationens "RS485 over TCP" på Home Assistants IP og den port. Spejlet
-  gentager controllerens læsninger med spørgsmål og svar, som integrationen ikke
-  kan se direkte fra adapteren, når controlleren er master.
-- **Styring:** slå "Connect to the controller API" til med Home Assistants IP,
-  port 8088 og nøglen fra WebUI'en (*Home Assistant → Forbindelse fra Home
-  Assistant*) eller `controller_token`.
+- **Data (MK1):** set a host port for `4196/tcp` in the app's network settings
+  and point the integration's "RS485 over TCP" at that port on the Home
+  Assistant host (`127.0.0.1` works). The mirror repeats the controller's reads
+  with both request and answer, which the integration cannot see straight from
+  the adapter once the controller is the bus master. It also leaves the adapter
+  with a single client.
+- **Data (MKII):** set a host port for `5020/tcp` and add the integration as
+  "HCH5 MKII – Modbus TCP" on that port.
+- **Control:** turn on "Connect to the controller API" with `127.0.0.1`, port
+  8088 and the key from the WebUI (*Home Assistant → Connection from Home
+  Assistant*) or `controller_token`.
 
-## Tilbage til HCP4
+## Back to HCP4 (MK1)
 
-Stop appen (eller slå `read_only` til) og sæt HCP4 i igen.
-Anlægget beholder de sidste ventilator- og bypassværdier, indtil HCP4 skriver.
+Stop the app (or turn on `read_only`) and reconnect HCP4. The unit keeps the
+last fan and bypass values until HCP4 writes.
