@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1-silkjaer.6
+
+- Without HAC1 the log no longer shows "Controller write failed: HAC1 not
+  installed" every 15 minutes or an afterheat refresh error at start-up: the
+  controller skips the afterheat setpoint once HAC1 is known to be missing.
+
 ## 1.6.1-silkjaer.5
 
 - Works for every HCH5: `unit` (mk1/mk2) and `connection` (tcp/serial) replace

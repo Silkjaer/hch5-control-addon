@@ -1,5 +1,5 @@
 name: HCH5 Control
-version: "1.6.1-silkjaer.5"
+version: "1.6.1-silkjaer.6"
 slug: hch5_control
 description: Local controller and WebUI for a Dantherm HCH5 MK1 or MKII
 url: https://github.com/Silkjaer/hch5-control-addon
