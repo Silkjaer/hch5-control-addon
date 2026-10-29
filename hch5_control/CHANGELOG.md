@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.1-silkjaer.8
+
+- Settings → Frikøling shows the room temperature free cooling steers by and
+  where it comes from (for example the average of the Home Assistant rooms).
+  Without HAC1, where the afterheat section is hidden, the room temperature
+  source is chosen there too.
+
 ## 1.6.1-silkjaer.7
 
 Fixes from a code audit:
