@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.1-silkjaer.9
+
+- The overview shows the room temperature free cooling steers by, and its
+  source, in the tile next to the bypass damper (where the afterheat tile is
+  on a unit with HAC1).
+- Settings fields keep their own height; one next to a field with long help
+  text was stretched. Under Frikøling the room temperature source comes first
+  and spans the full width.
+
 ## 1.6.1-silkjaer.8
 
 - Settings → Frikøling shows the room temperature free cooling steers by and

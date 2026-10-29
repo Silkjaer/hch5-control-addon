@@ -5,4 +5,4 @@ build_from:
 args:
   # Silkjaer/dantherm-control, branch main. Bump with the app version.
   SOURCE_REPO: https://github.com/Silkjaer/dantherm-control.git
-  SOURCE_REF: 4342c05ca553606bd0fbfc060ef7f5b01b3a209f
+  SOURCE_REF: 45b72db67669c75b242f4e07478fb6a7ee9c6106
