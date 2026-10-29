@@ -3,6 +3,6 @@ build_from:
   amd64: ghcr.io/home-assistant/amd64-base-python:3.12-alpine3.20
   armv7: ghcr.io/home-assistant/armv7-base-python:3.12-alpine3.20
 args:
-  # Silkjaer/dantherm-control, branch integration. Bump with the app version.
+  # Silkjaer/dantherm-control, branch main. Bump with the app version.
   SOURCE_REPO: https://github.com/Silkjaer/dantherm-control.git
   SOURCE_REF: 9bfd02afa72be2dff5b8a2132e1449f291008e43
