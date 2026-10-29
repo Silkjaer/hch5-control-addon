@@ -1,5 +1,5 @@
 name: HCH5 Control
-version: "1.6.1-silkjaer.6"
+version: "1.6.1-silkjaer.7"
 slug: hch5_control
 description: Local controller and WebUI for a Dantherm HCH5 MK1 or MKII
 url: https://github.com/Silkjaer/hch5-control-addon
@@ -10,7 +10,7 @@ arch:
 startup: application
 boot: auto
 init: false
-watchdog: http://[HOST]:[PORT:8080]/login
+watchdog: http://[HOST]:[PORT:8080]/healthz
 ingress: true
 ingress_port: 8080
 panel_icon: mdi:hvac

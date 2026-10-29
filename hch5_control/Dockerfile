@@ -2,7 +2,7 @@ ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
 RUN apk add --no-cache git tzdata \
- && pip install --no-cache-dir pyserial==3.5 paho-mqtt PyYAML
+ && pip install --no-cache-dir pyserial==3.5 paho-mqtt==2.1.0 PyYAML==6.0.3
 
 ARG SOURCE_REPO
 ARG SOURCE_REF
