@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.1-silkjaer.10
+
+- Humidity control uses the RH the unit measures in the extract air. It was
+  rescaled from the exhaust temperature to the extract temperature, which
+  roughly halved it (about 21 % instead of 48 %), so neither Local Auto nor
+  Smart Auto ever stepped up for humidity, and a shower never triggered Smart
+  Auto's quick rise.
+
 ## 1.6.1-silkjaer.9
 
 - The overview shows the room temperature free cooling steers by, and its
