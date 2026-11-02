@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.1-silkjaer.12
+
+- The level buttons on the overview run that level by hand, also in Auto and
+  Smart Auto. Before, they changed Auto's normal level there, so a tap on the
+  top step for a boost became Auto's base for good. Auto's normal level is set
+  in Settings.
+
 ## 1.6.1-silkjaer.11
 
 - The top step chosen by hand ends after four hours with six steps too, not
