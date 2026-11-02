@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.1-silkjaer.11
+
+- The top step chosen by hand ends after four hours with six steps too, not
+  only with Dantherm's four. It then returns to what ran before: Auto, Smart
+  Auto or the manual step (step 3 if that isn't known). The overview and the
+  settings say where it returns to.
+
 ## 1.6.1-silkjaer.10
 
 - Humidity control uses the RH the unit measures in the extract air. It was
