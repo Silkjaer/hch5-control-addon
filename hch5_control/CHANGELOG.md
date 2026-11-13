@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.1-silkjaer.13
+
+- The bypass closes when the air blown in (T2) has been below 6 °C for a
+  minute, whatever opened it: a bypass hold or Køl is cancelled and free
+  cooling stops. With the bypass open at 3.4 °C outside, the supply air fell
+  to about 4.5 °C and the unit stopped both fans by itself; they stayed
+  stopped until it lost power. A manual bypass still lets cold air in as long
+  as the supply air stays above 6 °C.
+
 ## 1.6.1-silkjaer.12
 
 - The level buttons on the overview run that level by hand, also in Auto and
