@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.1-silkjaer.14
+
+- The air balance uses the unit's own supply temperature (T2) when the unit
+  has no HAC1. Without HAC1 there is no afterheat coil, so that sensor already
+  reads the air leaving the core, and the balance no longer asks for an extra
+  1-Wire sensor. A 1-Wire T2 still comes first, and units with HAC1 behave as
+  before. Measurements are still left out while water condenses in the core.
+
 ## 1.6.1-silkjaer.13
 
 - The bypass closes when the air blown in (T2) has been below 6 °C for a
