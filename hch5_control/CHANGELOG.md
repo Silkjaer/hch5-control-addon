@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.6.1-silkjaer.15
+
+- The unit's own frost protection is reported instead of fought (from
+  MRDonnii's 1.7.3). When the exchanger risks icing, the HCH5 lowers the
+  supply fan below the Pi's value. The Pi took that as a failed write and kept
+  writing the fan back up during the defrost; now it leaves the unit alone,
+  logs the start and end, and shows `actual_unit_frost_protection` and
+  `actual_unit_frost_supply_percent` in the controller state.
+
 ## 1.6.1-silkjaer.14
 
 - The air balance uses the unit's own supply temperature (T2) when the unit
