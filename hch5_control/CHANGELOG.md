@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.1-silkjaer.16
+
+- The overview uses the unit's own T2 when there is no HAC1. Without an
+  afterheat coil that T2 is the supply air right after the core, so the
+  drawing no longer shows an estimated "T2 · beregnet" beside it, and the
+  supply-side recovery ("Veksler · T2") is filled in. Recovered heat and the
+  recovery diagnostics work on such units too.
+- The drawing uses the same names as the tiles: "Fraluft · T3" and
+  "Tilluft · T2".
+
 ## 1.6.1-silkjaer.15
 
 - The unit's own frost protection is reported instead of fought (from
